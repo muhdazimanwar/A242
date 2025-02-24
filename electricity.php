@@ -1,10 +1,5 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $voltage = floatval($_POST['voltage']);
-    $current = floatval($_POST['current']);
-    $hours = floatval($_POST['hours']);
-    $rate = floatval($_POST['rate']);
-
+function calculateElectricityCharge($voltage, $current, $hours, $rate) {
     // Calculate Power in Watts
     $power = $voltage * $current;
     
@@ -13,6 +8,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     // Calculate Total Charge in RM
     $total_charge = $energy * ($rate / 100);
+    
+    return [$power, $energy, $total_charge];
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $voltage = floatval($_POST['voltage']);
+    $current = floatval($_POST['current']);
+    $hours = floatval($_POST['hours']);
+    $rate = floatval($_POST['rate']);
+
+    list($power, $energy, $total_charge) = calculateElectricityCharge($voltage, $current, $hours, $rate);
 }
 ?>
 <!DOCTYPE html>
