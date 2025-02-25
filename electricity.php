@@ -1,14 +1,14 @@
 <?php
 function calculateElectricityCharge($voltage, $current, $rate) {
-    // Calculate Power in Watts
-    $power = $voltage * $current;
+    // Calculate Power in kWh
+    $power = ($voltage * $current) / 1000;
     
     // Create an array to store hourly charges
     $hourlyCharges = [];
     
     for ($hour = 1; $hour <= 24; $hour++) {
         // Calculate Energy in kWh
-        $energy = ($power * $hour) / 1000;
+        $energy = $power * $hour;
         
         // Calculate Total Charge in RM
         $total_charge = round($energy * ($rate / 100), 2);
@@ -60,7 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php if ($_SERVER['REQUEST_METHOD'] == 'POST') : ?>
             <div class="mt-4 p-3 bg-light border rounded">
                 <h4>Results:</h4>
-                <p><strong>Power (Watt):</strong> <?= number_format($power, 2) ?> W</p>
+                <p><strong>Power (kWh):</strong> <?= number_format($power, 4) ?> kWh</p>
+                <p><strong>Current Rate:</strong> <?= number_format($rate, 2) ?> sen/kWh</p>
                 <h4>24-Hour Electricity Cost Table</h4>
                 <table class="table table-bordered">
                     <thead>
