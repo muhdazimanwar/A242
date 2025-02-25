@@ -11,7 +11,7 @@ function calculateElectricityCharge($voltage, $current, $rate) {
         $energy = ($power * $hour) / 1000;
         
         // Calculate Total Charge in RM
-        $total_charge = $energy * ($rate / 100);
+        $total_charge = round($energy * ($rate / 100), 2);
         
         $hourlyCharges[$hour] = [
             'energy' => $energy,
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <tr>
                                 <td><?= $hour ?></td>
                                 <td><?= number_format($data['energy'], 4) ?> kWh</td>
-                                <td>RM <?= number_format($data['total_charge'], 4) ?></td>
+                                <td>RM <?= number_format($data['total_charge'], 2) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
