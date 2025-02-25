@@ -1,24 +1,33 @@
 <?php
-function calculateElectricityCharge($voltage, $current, $hours, $rate) {
+function calculateElectricityCharge($voltage, $current, $rate) {
     // Calculate Power in Watts
     $power = $voltage * $current;
     
-    // Calculate Energy in kWh
-    $energy = ($power * $hours) / 1000;
+    // Create an array to store hourly charges
+    $hourlyCharges = [];
     
-    // Calculate Total Charge in RM
-    $total_charge = $energy * ($rate / 100);
+    for ($hour = 1; $hour <= 24; $hour++) {
+        // Calculate Energy in kWh
+        $energy = ($power * $hour) / 1000;
+        
+        // Calculate Total Charge in RM
+        $total_charge = $energy * ($rate / 100);
+        
+        $hourlyCharges[$hour] = [
+            'energy' => $energy,
+            'total_charge' => $total_charge
+        ];
+    }
     
-    return [$power, $energy, $total_charge];
+    return [$power, $hourlyCharges];
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $voltage = floatval($_POST['voltage']);
     $current = floatval($_POST['current']);
-    $hours = floatval($_POST['hours']);
     $rate = floatval($_POST['rate']);
 
-    list($power, $energy, $total_charge) = calculateElectricityCharge($voltage, $current, $hours, $rate);
+    list($power, $hourlyCharges) = calculateElectricityCharge($voltage, $current, $rate);
 }
 ?>
 <!DOCTYPE html>
@@ -42,10 +51,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <input type="number" step="any" class="form-control" name="current" required>
             </div>
             <div class="form-group">
-                <label for="hours">Usage Time (Hours):</label>
-                <input type="number" step="any" class="form-control" name="hours" required>
-            </div>
-            <div class="form-group">
                 <label for="rate">Current Rate (sen/kWh):</label>
                 <input type="number" step="any" class="form-control" name="rate" required>
             </div>
@@ -56,8 +61,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="mt-4 p-3 bg-light border rounded">
                 <h4>Results:</h4>
                 <p><strong>Power (Watt):</strong> <?= number_format($power, 2) ?> W</p>
-                <p><strong>Energy Consumption (kWh):</strong> <?= number_format($energy, 2) ?> kWh</p>
-                <p><strong>Total Charge (RM):</strong> RM <?= number_format($total_charge, 2) ?></p>
+                <h4>24-Hour Electricity Cost Table</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Hour</th>
+                            <th>Energy (kWh)</th>
+                            <th>Total Charge (RM)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($hourlyCharges as $hour => $data) : ?>
+                            <tr>
+                                <td><?= $hour ?></td>
+                                <td><?= number_format($data['energy'], 4) ?> kWh</td>
+                                <td>RM <?= number_format($data['total_charge'], 4) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         <?php endif; ?>
     </div>
